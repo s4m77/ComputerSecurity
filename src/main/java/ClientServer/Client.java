@@ -42,7 +42,7 @@ public class Client {
 
             // Perform actions
             for (String action : actions) {
-                Thread.sleep(delay * 1000);
+                Thread.sleep(delay * 1000L);
                 out.println(action + " " + id);
                 System.out.println("Server response: " + in.readLine());
             }

@@ -20,6 +20,9 @@ public class Server {
         logFile = new File("server_log.txt");
     }
 
+    /**
+     * Starts the server and listens for client connections.
+     */
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             System.out.println("Server started on port " + port);
@@ -34,6 +37,10 @@ public class Server {
         }
     }
 
+    /**
+     * Logs an action to the server log file.
+     * @param message The message to log.
+     */
     public synchronized void logAction(String message) {
         try (FileWriter fw = new FileWriter(logFile, true);
              BufferedWriter bw = new BufferedWriter(fw);
@@ -44,12 +51,15 @@ public class Server {
         }
     }
 
+
     public static void main(String[] args) {
         int port = 12345; // Set your desired port here
         new Server(port).start();
     }
 
-    // Inner class for handling client connections
+    /**
+     * Inner class that handles a client connection.
+     */
     class ClientHandler implements Runnable {
         private Socket clientSocket;
         private Server server;
@@ -58,18 +68,28 @@ public class Server {
         private String clientId;
         private int counter;
 
+        /**
+         * Creates a new ClientHandler.
+         * @param socket The client socket.
+         * @param server The server.
+         */
         public ClientHandler(Socket socket, Server server) {
             this.clientSocket = socket;
             this.server = server;
         }
 
+        /**
+         * Runs the client handler.
+         */
         @Override
         public void run() {
+            // Open input and output streams
             try {
                 out = new PrintWriter(clientSocket.getOutputStream(), true);
                 in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
 
                 String inputLine;
+                // Read commands from the client
                 while ((inputLine = in.readLine()) != null) {
                     String[] tokens = inputLine.split(" ");
                     String command = tokens[0];
@@ -100,6 +120,10 @@ public class Server {
             }
         }
 
+        /**
+         * Handles a REGISTER command.
+         * @param tokens The tokens of the command.
+         */
         private void handleRegister(String[] tokens) {
             if (tokens.length != 3) {
                 out.println("ERROR Invalid registration format");
@@ -117,6 +141,10 @@ public class Server {
             out.println("ACK");
         }
 
+        /**
+         * Handles an INCREASE or DECREASE command.
+         * @param tokens The tokens of the command.
+         */
         private void handleCounterUpdate(String[] tokens) {
             if (tokens.length != 3) {
                 out.println("ERROR Invalid command format");
@@ -133,6 +161,9 @@ public class Server {
             out.println("Counter updated to " + counter);
         }
 
+        /**
+         * Handles a LOGOUT command.
+         */
         private void handleLogout() {
             clientHandlers.remove(clientId);
             out.println("Logged out");
