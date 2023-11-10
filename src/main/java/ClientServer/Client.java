@@ -14,9 +14,9 @@ public class Client {
     private int delay;
     private String[] actions;
 
-    public Client() throws IOException {
+    public Client(String path) throws IOException {
         // Parse the JSON configuration file
-        String content = new String(Files.readAllBytes(Paths.get("clients/example_config.json")));
+        String content = new String(Files.readAllBytes(Paths.get(path)));
         JSONObject json = new JSONObject(content);
 
         this.id = json.getString("id");
@@ -34,7 +34,6 @@ public class Client {
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
-            // Register with the server
             out.println("REGISTER " + id + " " + password);
             String response = in.readLine();
             if (!response.equals("ACK")) {
@@ -56,7 +55,8 @@ public class Client {
     }
 
     public static void main(String[] args) throws IOException {
-        Client client = new Client();
+        String examplePath = "clients/example_config.json";
+        Client client = new Client(examplePath);
         client.start();
     }
 }
