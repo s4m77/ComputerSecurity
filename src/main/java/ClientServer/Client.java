@@ -20,19 +20,14 @@ public class Client implements Runnable {
     private int delay;
     private String[] actions;
 
-    public static void main(String[] args) throws IOException {
-        String clt1 = "clients/client1.json";
-        String clt2 = "clients/client2.json";
+    public static void main(String[] args) throws IOException, InterruptedException {
+        String[] users = {"clients/client1.json", "clients/client2.json"};
 
-        Client client1 = new Client(clt1);
-        Client client2 = new Client(clt2);
+        for (String user : users) {
+             new Thread(new Client(user)).start();
+             Thread.sleep(1000L);
 
-        Thread t1 = new Thread(client1);
-        Thread t2 = new Thread(client2);
-
-        t1.start();
-
-        t2.start();
+        }
     }
 
     public Client(String path) throws IOException {
@@ -83,6 +78,7 @@ public class Client implements Runnable {
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
+            Thread.sleep(delay * 1000L);
             out.println("REGISTER " + id + " " + hashPassword(password));
 
             String response = in.readLine();

@@ -6,7 +6,7 @@
     "port": 12345
   },
   "actions": {
-    "delay": 5,
+    "delay": 3,
     "steps": [
       "INCREASE 7",
       "DECREASE 3"
