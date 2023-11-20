@@ -8,13 +8,19 @@ import java.util.concurrent.Executors;
 
 public class Server {
 
-    private int port;
+    /**
+     * SET DESIRED PORT HERE
+     */
+    private static final int PORT = 12345;
     private ConcurrentHashMap<String, ClientHandler> clientHandlers;
     private ExecutorService pool;
     private File logFile;
 
-    public Server(int port) {
-        this.port = port;
+    public static void main(String[] args) {
+        new Server().start();
+    }
+
+    public Server() {
         clientHandlers = new ConcurrentHashMap<>();
         pool = Executors.newCachedThreadPool();
         logFile = new File("server_log.txt");
@@ -24,8 +30,8 @@ public class Server {
      * Starts the server and listens for client connections.
      */
     public void start() {
-        try (ServerSocket serverSocket = new ServerSocket(port)) {
-            System.out.println("Server started on port " + port);
+        try (ServerSocket serverSocket = new ServerSocket(PORT)) {
+            System.out.println("Server started on port " + PORT);
 
             while (true) {
                 Socket clientSocket = serverSocket.accept();
@@ -52,11 +58,6 @@ public class Server {
     }
 
 
-    public static void main(String[] args) {
-        int port = 12345; // Set your desired port here
-        new Server(port).start();
-    }
-
     /**
      * Inner class that handles a client connection.
      */
@@ -66,6 +67,8 @@ public class Server {
         private PrintWriter out;
         private BufferedReader in;
         private String clientId;
+        private String password;
+
         private int counter;
 
         /**
@@ -131,14 +134,26 @@ public class Server {
             }
 
             String id = tokens[1];
+            String providedPassword = tokens[2];
+
+
             if (clientHandlers.containsKey(id)) {
-                out.println("ERROR ID already registered");
-                return;
+                ClientHandler existingClient = clientHandlers.get(id);
+                System.out.println(existingClient.password);
+                System.out.println(providedPassword);
+                if (!existingClient.password.equals(providedPassword)) {
+                    out.println("ERROR Cannot log in Client: " + id + " already exists");
+                }
+            } else {
+                // New registration
+                this.password = providedPassword; // Store the hashed password
+                clientId = id;
+                System.out.println(id);
+                System.out.println(clientHandlers);
+                clientHandlers.put(id, this);
+                out.println("ACK");
             }
 
-            clientId = id;
-            clientHandlers.put(id, this);
-            out.println("ACK");
         }
 
         /**
