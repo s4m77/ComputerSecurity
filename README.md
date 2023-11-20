@@ -1,6 +1,6 @@
 # ComputerSecurity
 
-In order to run the application you must first start the server [Server.java](src/main/java/ClientServer/Server.java) and then the client [Client.java](src/main/java/ClientServer/Client.java).
+In order to run the application you must **first** start the server [Server.java](src/main/java/ClientServer/Server.java) and **then** the client [Client.java](src/main/java/ClientServer/Client.java).
 
 
 To add a client create a `.json` file in the [clients](clients) folder. The file must contain the following information:
