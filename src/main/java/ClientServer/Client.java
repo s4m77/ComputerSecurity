@@ -23,22 +23,27 @@ public class Client implements Runnable {
     public static void main(String[] args) throws IOException, InterruptedException {
         String[] users = {"clients/client1.json", "clients/client2.json"};
 
+        int i = 0;
         for (String user : users) {
-             new Thread(new Client(user)).start();
-             Thread.sleep(1000L);
+            if(i++ > 1000) System.exit(0);
+            Client c = new Client(user);
+            {
+                new Thread(c).start();
+                Thread.sleep(1000L);
+            }
 
         }
     }
 
     public Client(String path) throws IOException {
         // Parse the JSON configuration file
-
         String content = new String(Files.readAllBytes(Paths.get(path)));
         JSONObject json = new JSONObject(content);
         Security.addProvider(new BouncyCastleProvider());
 
         this.id = json.getString("id");
         this.password = json.getString("password");
+        System.out.println("Client " + id + "passwd " + password);
         JSONObject server = json.getJSONObject("server");
         this.serverIp = server.getString("ip");
         this.serverPort = server.getInt("port");
@@ -78,20 +83,20 @@ public class Client implements Runnable {
              PrintWriter out = new PrintWriter(socket.getOutputStream(), true);
              BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()))) {
 
-            Thread.sleep(delay * 1000L);
-            out.println("REGISTER " + id + " " + hashPassword(password));
-
-            String response = in.readLine();
-            if (!response.equals("ACK")) {
-                throw new IOException("Registration failed: " + response);
-            }
-
-            // Perform actions
-            for (String action : actions) {
                 Thread.sleep(delay * 1000L);
-                out.println(action + " " + id);
-                System.out.println("Server response: " + in.readLine());
-            }
+                out.println("REGISTER " + id + " " + hashPassword(password));
+
+                String response = in.readLine();
+                if (!response.equals("ACK")) {
+                    throw new IOException("Registration failed: " + response);
+                }
+
+                // Perform actions
+                for (String action : actions) {
+                    Thread.sleep(delay * 1000L);
+                    out.println(action + " " + id);
+                    System.out.println("Server response: " + in.readLine());
+                }
 
             // Logout
             out.println("LOGOUT " + id);

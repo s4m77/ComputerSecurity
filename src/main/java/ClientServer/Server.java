@@ -94,6 +94,7 @@ public class Server {
                 String inputLine;
                 // Read commands from the client
                 while ((inputLine = in.readLine()) != null) {
+                    System.out.println("Inputline: " + inputLine);
                     String[] tokens = inputLine.split(" ");
                     String command = tokens[0];
 
@@ -137,7 +138,7 @@ public class Server {
             String providedPassword = tokens[2];
 
 
-            if (clientHandlers.containsKey(id)) {
+            if (clientHandlers.containsKey(id) && !clientHandlers.get(id).password.equals(providedPassword)) {
                 ClientHandler existingClient = clientHandlers.get(id);
                 System.out.println(existingClient.password);
                 System.out.println(providedPassword);
